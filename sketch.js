@@ -1,78 +1,36 @@
-let speech;
-let said;
-let word = [];
+var texts = "안녕하세요:)";
+var char = [];
+var up;
+var down = 5;
 var directionX;
 
-let video;
-let poseNet;
-let poses = [];
+function preload() {}
 
-let pkeyHandX, pkeyHandY, keyHandX, keyHandY;
-let img;
-function preload() {
-  img = loadImage("monet.png");
-}
 function setup() {
-  createCanvas(960, 650);
-  directionX = 1;
-  textSize(30);
-  speechRec = new p5.SpeechRec("ko-KR", gotSpeech);
-  let continuous = true;
-  let interimResults = false;
-  speechRec.start(continuous, interimResults);
-
-  function gotSpeech() {
-    console.log(speechRec);
-    if (speechRec.resultValue) {
-      said = speechRec.resultString;
-      word = said.split("");
-      console.log(said);
-    }
-  }
-
-  video = createCapture(VIDEO);
-  video.size(width, height);
-  poseNet = ml5.poseNet(video, modelReady);
-  poseNet.on("pose", function (results) {
-    poses = results;
-  });
-  video.hide();
-}
-
-function modelReady() {
-  console.log("Ai Activated!");
+  createCanvas(windowWidth, windowHeight);
+  char = texts.split("");
+  directionX - 1;
+  // background(0, 255, 0);
+  // textSize(12);
+  // textFont('Georgia');
+  // text(texts, 10, 23);
 }
 
 function draw() {
-  image(video, 0, 0, width, height);
-  drawKeypoints();
+  background(0, 255, 0); //background가 없으면 글씨의 흔적이 따라다님
+  textSize(25);
+  if (pmouseX < mouseX) {
+    directionX = -1;
+  }
+  if (pmouseX >= mouseX) {
+    directionX = 1;
+  }
+  //text(char[0], mouseX, mouseY); //마우스를 따라다님
+  for (var i = 0; i < char.length; i++) {
+    text(char[i], mouseX + directionX * i * 30, random(mouseY - 7, mouseY + 7));
+  }
 }
 
-function drawKeypoints() {
-  for (let i = 0; i < poses.length; i++) {
-    let pose = poses[i].pose;
-    let keypoint = pose.keypoints[0];
-    if (keypoint.score > 0.2) {
-      keyHandX = pkeyHandX;
-      keyHandY = pkeyHandY;
-      pkeyHandX = keypoint.position.x;
-      pkeyHandY = keypoint.position.y;
-
-      if (keyHandX > width / 2) {
-        directionX = -1;
-      }
-      if (keyHandX < width / 2) {
-        directionX = 1;
-      }
-      for (var j = 0; j < word.length; j++) {
-        image(img, keyHandX - 125, keyHandY, 250, 250);
-        text(
-          word[j],
-          keyHandX + directionX * j * 25,
-          random(keyHandY - 3, keyHandY + 3)
-        );
-        console.log(word[j]);
-      }
-    }
-  }
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
 }
